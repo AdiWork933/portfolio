@@ -25,17 +25,18 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     
-    # --- MODIFIED STEP ---
+    # --- OPTIMIZED INSTALL STEP ---
     - name: Install dependencies
       run: |
+        # 1. Upgrade pip
         python -m pip install --upgrade pip
-        # Install testing tools (flake8, pytest) and the Flask package
-        python -m pip install flake8 pytest flask
-        # Also install pytest-cov for coverage reporting (optional but recommended)
-        python -m pip install pytest-cov
-        # Install dependencies from requirements.txt if it exists
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    # ---------------------
+        
+        # 2. Install core tools: Linter (flake8), Testing (pytest, pytest-cov), and Application (flask)
+        python -m pip install flake8 pytest pytest-cov flask
+        
+        # 3. Install project-specific dependencies from requirements.txt (if it exists)
+        if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+    # ------------------------------
 
     - name: Lint with flake8
       run: |
@@ -44,12 +45,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     
-    # --- MODIFIED STEP ---
     - name: Test with pytest (including coverage)
-      # Assuming your tests are in a 'tests/' directory and use the pytest framework.
-      # The pytest command will automatically discover tests.
       run: |
-        # Use coverage reporting with pytest
-        # The `--cov=.` means report coverage for the current directory/project.
+        # Run tests and generate an XML coverage report
         pytest --cov=. --cov-report=xml
-    # ---------------------
